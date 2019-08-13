@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<!-- Bootstrap core CSS -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
+<!-- Custom styles for this template -->
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="description" content="랜덤 채팅">
+<meta name="author" content="kbs_92@naver.com">
+<meta name="keyword" content="랜덤 채팅">
+<meta property="og:type" content="website">
+<meta property="og:title" id="ogtitle" content="랜덤 채팅">
+<meta property="og:description" id="ogdesc" content="랜덤 채팅">
+<title>랜덤 채팅</title>
+<script
+  src="https://code.jquery.com/jquery-3.4.1.min.js"
+  integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
+  crossorigin="anonymous"></script>
+<script type="text/javascript">
+	var wsocket;
+	
+	function connect() {
+		wsocket = new WebSocket("ws://blog.ggwp.kr:49080/chat/roomchat-ws");
+		wsocket.onopen = onOpen;
+		wsocket.onmessage = onMessage;
+		wsocket.onclose = onClose;
+	}
+	function disconnect() {
+		wsocket.close();
+	}
+	function onOpen(evt) {
+		console.log("connection");
+		$('#enterBtn').prop("disabled", true);
+		$('#sendBtn').prop("disabled", false);
+// 		appendMessage("연결되었습니다.");
+	}
+	function onMessage(evt) {
+		var data = evt.data;
+			console.log(evt);
+// 		if (data.substring(0, 4) == "msg:") {
+// 			appendMessage(data.substring(4));
+			appendMessage(data);
+// 		}
+	}
+	function onClose(evt) {
+		console.log("disconnection");
+		appendMessage("연결을 끊었습니다.");
+		$('#enterBtn').prop("disabled", false);
+		$('#sendBtn').prop("disabled", true);
+	}
+	
+	function send() {
+		var nickname = $("#nickname").val();
+		var msg = $("#message").val();
+		wsocket.send("["+nickname + "] " + msg);
+		$("#message").val("");
+	}
+
+	function appendMessage(msg) {
+		$("#chatMessageArea").append(msg+"<br>");
+		var chatAreaHeight = $("#chatArea").height();
+		var maxScroll = $("#chatMessageArea").height() - chatAreaHeight;
+		$("#chatArea").scrollTop(maxScroll);
+	}
+
+	$(document).ready(function() {
+		$('#message').keypress(function(event){
+			var keycode = (event.keyCode ? event.keyCode : event.which);
+			if(keycode == '13'){
+				send();	
+			}
+			event.stopPropagation();
+		});
+		$('#sendBtn').click(function() { send(); });
+		$('#enterBtn').click(function() { connect(); });
+		$('#exitBtn').click(function() { disconnect(); });
+	});
+</script>
+<style>
+#chatArea {
+	width: 600px;
+	height: 480px;
+	overflow-y: auto;
+	border: 1px solid black;
+}
+body {
+  padding-top: 54px;
+}
+
+@media (min-width: 992px) {
+  body {
+    padding-top: 56px;
+  }
+}
+</style>
+</head>
+<body>
+ <!-- Navigation -->
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+    <div class="container">
+      <div class="collapse navbar-collapse" id="navbarResponsive">
+        <ul class="navbar-nav ml-auto">
+          <li class="nav-item active">
+            <a class="nav-link" href="http://kbs92.github.io">Home
+              <span class="sr-only">Home</span>
+            </a>
+          </li>
+          <!-- <li class="nav-item">
+            <a class="nav-link" href="#">About</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#">Services</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#">Contact</a>
+          </li> -->
+        </ul>
+      </div>
+    </div>
+  </nav>
+    <div class="container" style="margin: 0 auto;">
+    <br>
+    <div style="margin: 0 auto; text-align: center; width:100%;">
+		닉네임 : <input type="text" id="nickname"> <input type="button"
+			id="enterBtn" value="입장"> <input type="button" id="exitBtn"
+			value="나가기">
+</div>
+		<center><h1>랜덤 채팅</h1></center>
+		<div id="chatArea" style="margin: 0 auto;">
+			<div style="margin: 0 auto;" id="chatMessageArea"></div>
+		</div>
+		<br /> 
+		<div style="margin: 0 auto; text-align: center; margin-bottom: 50px; width:100%;">
+		<input type="text" id="message" style="width:50%;">
+		 <input type="button"		id="sendBtn" value="전송">
+			</div>
+				</div>
+	 <!-- Footer -->
+    <footer class="py-5 bg-dark">
+      <div class="container">
+      </div>
+      <div class="container">
+        <p class="m-0 text-center text-white">Copyright &copy; kbs_92@naver.com</p>
+      </div>
+      <!-- /.container -->
+    </footer>
+	<!-- Bootstrap core JavaScript -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js"></script>
+</body>
+</html>
